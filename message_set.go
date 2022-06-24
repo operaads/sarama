@@ -57,7 +57,15 @@ type MessageSet struct {
 }
 
 func (ms *MessageSet) encode(pe packetEncoder) error {
+	var correction int
+	if len(ms.Messages) == 1 && ms.Messages[0].Msg.Set != nil {
+		correction = len(ms.Messages[0].Msg.Set.Messages)
+	} else {
+		correction = len(ms.Messages)
+	}
+
 	for i := range ms.Messages {
+		ms.Messages[i].Offset = int64(i + correction - 1)
 		err := ms.Messages[i].encode(pe)
 		if err != nil {
 			return err
